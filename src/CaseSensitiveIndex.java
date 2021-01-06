@@ -1,14 +1,15 @@
 import java.io.File;
 import java.util.TreeSet;
 
-public class CaseSensitiveIndex implements AbstractInvertedIndex{
-    @Override
-    public void buildInvertedIndex(File[] files) {
+public class CaseSensitiveIndex extends AbstractInvertedIndex{
+    protected static CaseSensitiveIndex caseSensitiveIndex;
+    protected CaseSensitiveIndex(){}
+    
 
-    }
-
     @Override
-    public TreeSet<String> runQuery(String query) {
-        return null;
+    protected boolean compare(String key, String word){
+        key = key.toLowerCase();
+        word = word.toLowerCase();
+        return key.equals(word);
     }
 }

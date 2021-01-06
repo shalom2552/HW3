@@ -1,11 +1,19 @@
+
 public class CaseSensitiveFactory extends AbstractInvertedIndexFactory{
 
     @Override
-    public AbstractInvertedIndex createInvertedIndex(){
-        System.out.println();
-        return null;
+    // single tone pattern
+    public CaseSensitiveIndex createInvertedIndex(){
+        CaseSensitiveIndex index;
+        if (CaseSensitiveIndex.caseSensitiveIndex == null){
+            CaseSensitiveIndex caseSensitiveIndex =
+                    new CaseSensitiveIndex();
+            System.out.println("New CaseSensitive index is created");
+            index = caseSensitiveIndex;
+        }else {
+            System.out.println("You already have CaseSensitive index");
+            index = CaseSensitiveIndex.caseSensitiveIndex;
+        }
+        return index;
     }
-
-    //TODO is this needs to be single-tone?
-
 }
