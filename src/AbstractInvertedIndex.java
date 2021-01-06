@@ -10,27 +10,74 @@ public abstract class AbstractInvertedIndex {
         dataBase.addAll(Arrays.asList(files));
     }
 
+
+
     // this is called from main
     // TODO this function is in construction
     public TreeSet<String> runQuery(String query) {
+        // TODO use stack to save keys (or also operators?)
         // parse query and get only keys at first
-        // make keys list, only those ho never checked
-        // TODO use stack to save keys
-        String[] keys = {"make", "this"};
+        // make keys list, only those who never checked
+        ArrayList<String> queryKeys = new ArrayList<>();
+        for ( String word : Utils.splitBySpace(query)) {
+            if (!isOperator(word)){
+                queryKeys.add(word);
+            }
+        }
+
+        // check if keys have checked before
+        ArrayList<String> uncheckedKeys = checkKeys(queryKeys);
 
         // save results for the new keys
-        for (String key : keys){
-            Map<String,HashSet<String>> wordMap = new HashMap<>();
-            wordMap.put(key,filesContained(key));
-            wordListMap.add(wordMap);
-        }
+        updateKeys(uncheckedKeys);
+
         // parse query and collect all files witch need
 
         // return files List
         return null;
     }
 
+    protected void updateKeys(ArrayList<String> keys){
+        for (String key : keys){
+            Map<String,HashSet<String>> wordMap = new HashMap<>();
+            wordMap.put(key,filesContained(key));
+            wordListMap.add(wordMap);
+        }
+    }
 
+    // returns the keys that never been queries
+    protected ArrayList<String> checkKeys(ArrayList<String> keys){
+        ArrayList<String> uncheckedKeys = new ArrayList<>();
+        for ( String key : keys) {
+            for (Map<String,HashSet<String>> map : wordListMap){
+                if (map.containsKey(key)){
+                    uncheckedKeys.add(key);
+                }
+            }
+        }
+        return uncheckedKeys;
+    }
+
+
+    protected void parseQuery(String query){
+        // this if means - no brackets are in the query
+        if (Utils.substringBetween(query, "(", ")")== null){
+            String[] querySplit = Utils.splitBySpace(query);
+            for (String word : querySplit){
+                if (!isOperator(word)) {
+                    // TODO keep going
+                }
+            }
+        } else { // what to do if there is more then one brackets?
+
+        }
+
+    }
+
+    protected boolean isOperator(String word){
+        return (!word.equals("NOT") && !word.equals("OR") &&
+                !word.equals("AND") && !word.equals("(") && !word.equals(")"));
+    }
 
     protected HashSet<String> filesContained(String key){
         HashSet<String> filesContained = new HashSet<>();
