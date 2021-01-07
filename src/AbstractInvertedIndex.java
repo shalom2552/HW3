@@ -32,6 +32,7 @@ public abstract class AbstractInvertedIndex {
         updateKeys(uncheckedKeys);
 
         // parse query and collect all files witch need
+        parseQuery(query);
 
         // return files List
         return null;
@@ -86,11 +87,11 @@ public abstract class AbstractInvertedIndex {
             if (fileName != null){
                 filesContained.add(fileName);
             }
-        } return filesContained;
+        } return filesContained; // TODO can be null
     }
 
 
-    // TODO substring between?
+    // TODO check only what in <TEXT> (may be more then one)
     protected String keyIsInFile(File file, String key){
         List<String> fileLines = Utils.readLines(file);
         for (String row : fileLines){
