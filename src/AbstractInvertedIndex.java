@@ -2,18 +2,16 @@ import java.io.File;
 import java.util.*;
 
 public abstract class AbstractInvertedIndex {
-    protected List<Map<String,HashSet<String>>> wordListMap;
+    protected List<Map<String,HashSet<String>>> keyListMap;
     protected List<File> dataBase;
+//    <key, ["AP11", "SP22"]>,<key, ["AP11", "SP22"]>,<key, ["AP11", "SP22"]>
 
     // this is called from main
     public void buildInvertedIndex(File[] files) {
         dataBase.addAll(Arrays.asList(files));
     }
 
-
-
-    // this is called from main
-    // TODO this function is in construction
+    // called from main
     public TreeSet<String> runQuery(String query) {
         // TODO use stack to save keys (or also operators?)
         // parse query and get only keys at first
@@ -42,7 +40,7 @@ public abstract class AbstractInvertedIndex {
         for (String key : keys){
             Map<String,HashSet<String>> wordMap = new HashMap<>();
             wordMap.put(key,filesContained(key));
-            wordListMap.add(wordMap);
+            keyListMap.add(wordMap);
         }
     }
 
@@ -50,15 +48,14 @@ public abstract class AbstractInvertedIndex {
     protected ArrayList<String> checkKeys(ArrayList<String> keys){
         ArrayList<String> uncheckedKeys = new ArrayList<>();
         for ( String key : keys) {
-            for (Map<String,HashSet<String>> map : wordListMap){
-                if (map.containsKey(key)){
+            for (Map<String,HashSet<String>> keyMap : keyListMap){
+                if (!keyMap.containsKey(key)){
                     uncheckedKeys.add(key);
                 }
             }
         }
         return uncheckedKeys;
     }
-
 
     protected void parseQuery(String query){
         // this if means - no brackets are in the query
@@ -72,9 +69,9 @@ public abstract class AbstractInvertedIndex {
         } else { // what to do if there is more then one brackets?
 
         }
-
     }
 
+    // return true if the word is a key
     protected boolean isOperator(String word){
         return (!word.equals("NOT") && !word.equals("OR") &&
                 !word.equals("AND") && !word.equals("(") && !word.equals(")"));
@@ -90,7 +87,6 @@ public abstract class AbstractInvertedIndex {
         } return filesContained; // TODO can be null
     }
 
-
     // TODO check only what in <TEXT> (may be more then one)
     protected String keyIsInFile(File file, String key){
         List<String> fileLines = Utils.readLines(file);
@@ -105,12 +101,11 @@ public abstract class AbstractInvertedIndex {
         return null;
     }
 
-    // this is for caseSensitive override
-    protected boolean compare(String key, String word){
-        return key.equals(word);
+    // for caseSensitive override
+    protected boolean compare(String key, String word){ return key.equals(word);
     }
 
-    // TODO should be in utils?
+    // TODO should be in util?
     protected HashSet<String> cuttingBetweenGroups(
             HashSet<String> list1, HashSet<String> list2){
         HashSet<String> results = new HashSet<>();
@@ -124,13 +119,53 @@ public abstract class AbstractInvertedIndex {
         return results;
     }
 
-    // TODO should be in utils?
-    // TODO if results needs to be sorted, then we will build merge sort
+    // TODO should be in util?
+    // TODO results needs to be sorted, (merge sort)
     protected HashSet<String> unionBetweenGroups(
-            HashSet<String> list1, HashSet<String> list2){
-        HashSet<String> results = new HashSet<>(list1);
-        results.addAll(list2);
+            String[] list1, String[] list2){
+        HashSet<String> results = new HashSet<>();
+
+        int i=0, j=0;
+        while (i < list1.length || j < list2.length) { // TODO check working
+            if (i == list1.length){
+                results.add(list2[j]);
+                j++;
+            } else if (j == list2.length){
+                results.add(list1[i]);
+                i++;
+            }
+            if (compareFilesName(list1[i], list2[j])) { // list1 < list2
+                results.add(list1[i]);
+                i++;
+            }
+            else {
+                results.add(list2[j]);
+                j++;
+            }
+        }
         return results;
+    }
+
+    // list1 subtract list2
+    protected HashSet<String> subtractionBetweenGroups(
+            HashSet<String> list1, HashSet<String> list2){
+        for (String elem: list2) { list1.remove(elem); }
+        return list1; // list1 subtract list2
+    }
+
+    // return true if first file name is smaller then second one
+    protected boolean compareFilesName(String file1, String file2){
+        String[] name1 = file1.substring(2).split("-");
+        String[] name2 = file2.substring(2).split("-");
+        if (Integer.parseInt(name1[0]) < Integer.parseInt(name2[0])){
+            return true;
+        } else if (Integer.parseInt(name1[0]) ==
+                Integer.parseInt(name2[0])){
+            return Integer.parseInt(name1[1]) <
+                    Integer.parseInt(name2[1]);
+        }else {
+            return false;
+        }
     }
 
 }
