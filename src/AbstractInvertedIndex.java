@@ -95,4 +95,37 @@ public abstract class AbstractInvertedIndex implements Index{
                 !word.equals("AND") && !word.equals("(") && !word.equals(")"));
     }
 
+    // return sortedMap which contains the cutting between the tow index's
+    // keys - only letters, contains at most in 4 files
+    // value - the files that contain the key
+    public static SortedMap<String, Set<String>> intersectionMap(
+            CaseSensitiveIndex caseSensitiveIndex,
+            CaseInsensitiveIndex caseInsensitiveIndex
+    ) {
+        SortedSet<String> cutKeySet = new TreeSet<>();
+        Set<String> sensitive = caseSensitiveIndex.keyListMap.keySet();
+        Set<String> inSensitive = caseInsensitiveIndex.keyListMap.keySet();
+
+        Map<String,Set<String>> keyListMap = caseSensitiveIndex.keyListMap;
+
+        for (String key1 : sensitive){
+            for (String key2 : inSensitive){
+                if (key1.equals(key2)){
+                    if (keyListMap.get(key1).size() <= 4){
+                        cutKeySet.add(key1);
+                    }
+                }
+
+            }
+        }
+
+        SortedSet<String> keys = new TreeSet<>(cutKeySet);
+        SortedMap<String,Set<String>> cutMap = new TreeMap<>();
+        for (String key : keys){
+            cutMap.put(key, keyListMap.get(key));
+        }
+
+        return cutMap;
+    }
+
 }

@@ -1,4 +1,11 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+
 
 /**
  * The main user class.
@@ -18,10 +25,20 @@ public class DocumentRetrieval {
         AbstractInvertedIndex caseSensitiveIndex = caseSensitiveFactory.createInvertedIndex();
         AbstractInvertedIndex caseSensitiveIndexTwo = caseSensitiveFactory.createInvertedIndex();
 
-        caseInsensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
-        caseSensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
 
-        for (String query : Utils.readLines(new File (args[1]))){
+//        caseInsensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
+//        caseSensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
+
+        /********  FOR PROGRAM ARGUMENTS ********/
+        caseInsensitiveIndex.buildInvertedIndex( (new File("/home/marshall" +
+                "/Documents/HW3/AP_Coll_Parsed").listFiles()));
+        caseSensitiveIndex.buildInvertedIndex( (new File("/home/marshall/Documents/HW3/AP_Coll_Parsed")).listFiles());
+
+        /********  FOR PROGRAM ARGUMENTS ********/
+
+//        for (String query : Utils.readLines(new File (args[1]))){
+        for (String query : Utils.readLines(new File ("/home/marshall" +
+                "/Documents/HW3/BooleanQueries.txt"))){
             System.out.println("######################################");
             System.out.println("Query: " + query);
             System.out.println("----NonCaseSensitiveIndex----");
@@ -30,6 +47,32 @@ public class DocumentRetrieval {
             Utils.printList(caseSensitiveIndex.runQuery(query));
         }
         /********  YOUR CODE FOR PART 2 STARTS HERE ********/
+
+        try {
+            File file = new File("IntersectionsOutput.txt");
+            if (!file.createNewFile()) System.out.println("file already exist");
+
+            FileWriter writer = new FileWriter("IntersectionsOutput.txt");
+            writer.write("######################################");
+            writer.write("----Intersections----");
+
+
+
+            SortedMap<String, Set<String>> intersection =
+                    AbstractInvertedIndex.intersectionMap(
+                    CaseSensitiveIndex.caseSensitiveIndex,
+                    CaseInsensitiveIndex.caseInsensitiveIndex);
+
+
+            for (SortedMap.Entry<String, Set<String>> entry : intersection.entrySet()) {
+                System.out.println(entry.getKey() + " : " + entry.getValue().toString());
+            }
+
+            writer.close();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
 
         /********  YOUR CODE FOR PART 2 ENDS HERE ********/
