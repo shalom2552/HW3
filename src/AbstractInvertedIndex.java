@@ -2,7 +2,8 @@ import java.io.File;
 import java.util.*;
 
 public abstract class AbstractInvertedIndex implements Index{
-    protected Map<String,Set<String>> keyListMap;
+    protected Map<String,Set<String>> keyListMap = new HashMap<>();
+    public boolean isSensitive;
 
     // this is called from main
     public void buildInvertedIndex(File[] files) {
@@ -40,7 +41,7 @@ public abstract class AbstractInvertedIndex implements Index{
             }
             else {
                 word = handleCase(word);
-                Set<String> filesName = keyListMap.get(word);
+                Set<String> filesName = this.keyListMap.get(word);
                 stack.push(filesName);
             }
         }
@@ -61,7 +62,7 @@ public abstract class AbstractInvertedIndex implements Index{
         }
     }
 
-    // this is for caseSensitiv override
+    // this is for caseSensitive override
     // returns the lower case word if its a caseSensitive
     public String handleCase(String key){
         return key;
@@ -70,6 +71,7 @@ public abstract class AbstractInvertedIndex implements Index{
     protected Stack<Set<String>> updateStack(
             String query, Stack<Set<String>> stack){
 
+        // TODO this throws an emptyStackException at first time call
         Set<String> set1 = stack.pop();
         Set<String> set2 = stack.pop();
         switch (query){
@@ -89,10 +91,10 @@ public abstract class AbstractInvertedIndex implements Index{
         return stack;
     }
 
-    // return true if the word is a key
+    // return true if the word is an operator
     protected boolean isOperator(String word){
-        return (!word.equals("NOT") && !word.equals("OR") &&
-                !word.equals("AND") && !word.equals("(") && !word.equals(")"));
+        return (word.equals("NOT") || word.equals("OR") ||
+                word.equals("AND") || word.equals("(") || word.equals(")"));
     }
 
     // return sortedMap which contains the cutting between the tow index's

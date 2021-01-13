@@ -60,8 +60,8 @@ public class DocumentRetrieval {
 
             SortedMap<String, Set<String>> intersection =
                     AbstractInvertedIndex.intersectionMap(
-                    CaseSensitiveIndex.caseSensitiveIndex,
-                    CaseInsensitiveIndex.caseInsensitiveIndex);
+                            (CaseSensitiveIndex) caseSensitiveIndex,
+                            (CaseInsensitiveIndex) caseInsensitiveIndex);
 
 
             for (SortedMap.Entry<String, Set<String>> entry : intersection.entrySet()) {

@@ -3,7 +3,9 @@ import java.util.TreeSet;
 
 public class CaseInsensitiveIndex extends AbstractInvertedIndex{
     protected static CaseInsensitiveIndex caseInsensitiveIndex;
-    protected CaseInsensitiveIndex(){}
+
+    public CaseInsensitiveIndex(){}
+    // TODO this should be private. its a single tone!
 
     @Override
     public String handleCase(String key){

@@ -1,19 +1,16 @@
 
 public class CaseInsensitiveFactory extends AbstractInvertedIndexFactory{
+    private static CaseInsensitiveIndex caseInsensitiveIndex = null;
 
     @Override
     // single tone pattern
-    public CaseInsensitiveIndex createInvertedIndex(){
-        CaseInsensitiveIndex index;
-        if (CaseInsensitiveIndex.caseInsensitiveIndex == null){
-            CaseInsensitiveIndex caseInsensitiveIndex =
-                    new CaseInsensitiveIndex();
+    public AbstractInvertedIndex createInvertedIndex(){
+        if (caseInsensitiveIndex == null) {
+            caseInsensitiveIndex = new CaseInsensitiveIndex();
             System.out.println("New CaseInsensitive index is created");
-            index = caseInsensitiveIndex;
-        }else {
+        } else {
             System.out.println("You already have CaseInsensitive index");
-            index = CaseInsensitiveIndex.caseInsensitiveIndex;
         }
-        return index;
+        return caseInsensitiveIndex;
     }
 }
