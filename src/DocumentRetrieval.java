@@ -1,10 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
+import java.util.*;
 
 
 /**
@@ -38,7 +35,7 @@ public class DocumentRetrieval {
 
 //        for (String query : Utils.readLines(new File (args[1]))){
         for (String query : Utils.readLines(new File ("/home/marshall" +
-                "/Documents/HW3/BooleanQueries.txt"))){
+                "/Documents/HW3/BooleanQueries.txt"))){ // TODO program-args
             System.out.println("######################################");
             System.out.println("Query: " + query);
             System.out.println("----NonCaseSensitiveIndex----");
@@ -58,13 +55,14 @@ public class DocumentRetrieval {
 
 
 
-            SortedMap<String, Set<String>> intersection =
+            SortedMap<String, ArrayList<String>> intersection =
                     AbstractInvertedIndex.intersectionMap(
                             (CaseSensitiveIndex) caseSensitiveIndex,
                             (CaseInsensitiveIndex) caseInsensitiveIndex);
 
 
-            for (SortedMap.Entry<String, Set<String>> entry : intersection.entrySet()) {
+            for (SortedMap.Entry<String, ArrayList<String>> entry :
+                    intersection.entrySet()) {
                 System.out.println(entry.getKey() + " : " + entry.getValue().toString());
             }
 
