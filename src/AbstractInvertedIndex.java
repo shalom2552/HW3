@@ -33,14 +33,41 @@ public abstract class AbstractInvertedIndex implements Index{
 
     public TreeSet<String> runQuery(String query){
         Stack<ArrayList<String>> stack = new Stack<>();
+        StringBuilder subString = new StringBuilder();
+        subString.append(query);
+        String subQuery;
+        if(query.contains("(")) {
+            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
+                while (query.contains("(")) {
+                    subString.delete(0, 1);
+                    subString.delete(subString.lastIndexOf(")"), subString.length());
+                    subQuery = subString.toString();
 
-        brackets(query, stack);
+                    stack.push(parenthesesHandler(subQuery));
+
+                    query = clearQuery(query, 2);
+                }
+            } else {
+                while (query.contains("(")) {
+                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
+                    stack.push(parenthesesHandler(subQuery));
+                    subString.delete(subString.indexOf("("),
+                            subString.indexOf(")")+2);
+                    query = subString.toString();
+                }
+            }
+        }
+
+
 
         String[] queryList = Utils.splitBySpace(query);
         if (queryList.length == 1 && isOperator(queryList[0])){
             handleOperator(stack, queryList[0]);
             return new TreeSet<>(stack.pop());
         }
+
+
+
 
         boolean usedWord = false;
         for (int i = 0; i < queryList.length; i++) {
@@ -62,30 +89,28 @@ public abstract class AbstractInvertedIndex implements Index{
     }
 
 
-    public void brackets(String query, Stack stack){
-        if(query.contains("(")) {
-            StringBuilder subString = new StringBuilder();
-            subString.append(query);
-            String subQuery;
-            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
-                while (query.contains("(")) {
-                    subString.delete(0, 1);
-                    subString.delete(subString.lastIndexOf(")"), subString.length());
-                    subQuery = subString.toString();
-                    stack.push(parenthesesHandler(subQuery));
-                    query = clearQuery(query, 2);
-                }
-            } else {
-                while (query.contains("(")) {
-                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
-                    stack.push(parenthesesHandler(subQuery));
-                    subString.delete(subString.indexOf("("),
-                            subString.indexOf(")")+2);
-                    query = subString.toString();
-                }
-            }
-        }
-    }
+//    public void fun(){
+//        if(query.contains("(")) {
+//            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
+//                while (query.contains("(")) {
+//                    subString.delete(0, 1);
+//                    subString.delete(subString.lastIndexOf(")"), subString.length());
+//                    subQuery = subString.toString();
+//
+//                    stack.push(parenthesesHandler(subQuery));
+//
+//                    query = clearQuery(query, 2);
+//                }
+//            } else {
+//                while (query.contains("(")) {
+//                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
+//                    stack.push(parenthesesHandler(subQuery));
+//                    subString.delete(subString.indexOf("("), subString.indexOf(")")+1);
+//                    query = subString.toString();
+//                }
+//            }
+//        }
+//    }
 
     public String clearQuery(String query, int count){
         StringBuilder editString = new StringBuilder();
