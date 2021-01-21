@@ -89,28 +89,28 @@ public abstract class AbstractInvertedIndex implements Index{
     }
 
 
-//    public void fun(){
-//        if(query.contains("(")) {
-//            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
-//                while (query.contains("(")) {
-//                    subString.delete(0, 1);
-//                    subString.delete(subString.lastIndexOf(")"), subString.length());
-//                    subQuery = subString.toString();
-//
-//                    stack.push(parenthesesHandler(subQuery));
-//
-//                    query = clearQuery(query, 2);
-//                }
-//            } else {
-//                while (query.contains("(")) {
-//                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
-//                    stack.push(parenthesesHandler(subQuery));
-//                    subString.delete(subString.indexOf("("), subString.indexOf(")")+1);
-//                    query = subString.toString();
-//                }
-//            }
-//        }
-//    }
+    public void fun(String query, ){
+        if(query.contains("(")) {
+            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
+                while (query.contains("(")) {
+                    subString.delete(0, 1);
+                    subString.delete(subString.lastIndexOf(")"), subString.length());
+                    subQuery = subString.toString();
+
+                    stack.push(parenthesesHandler(subQuery));
+
+                    query = clearQuery(query, 2);
+                }
+            } else {
+                while (query.contains("(")) {
+                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
+                    stack.push(parenthesesHandler(subQuery));
+                    subString.delete(subString.indexOf("("), subString.indexOf(")")+1);
+                    query = subString.toString();
+                }
+            }
+        }
+    }
 
     public String clearQuery(String query, int count){
         StringBuilder editString = new StringBuilder();
