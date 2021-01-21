@@ -23,14 +23,14 @@ public class DocumentRetrieval {
         AbstractInvertedIndex caseSensitiveIndexTwo = caseSensitiveFactory.createInvertedIndex();
 
 
-//        caseInsensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
-//        caseSensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
+        caseInsensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
+        caseSensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
 
 //        /********  FOR PROGRAM ARGUMENTS ********/
 //        caseInsensitiveIndex.buildInvertedIndex( (new File("/home/marshall" +
 //                "/Documents/HW3/AP_Coll_Parsed").listFiles()));
 //        caseSensitiveIndex.buildInvertedIndex( (new File("/home/marshall/Documents/HW3/AP_Coll_Parsed")).listFiles());
-//
+
 //        /********  FOR PROGRAM ARGUMENTS ********/
 
         for (String query : Utils.readLines(new File (args[1]))){
