@@ -33,40 +33,10 @@ public abstract class AbstractInvertedIndex implements Index{
 
     public TreeSet<String> runQuery(String query){
         Stack<ArrayList<String>> stack = new Stack<>();
-
-        // handle brackets
-        brackets(query, stack);
-
-        String[] queryList = Utils.splitBySpace(query);
-        if (queryList.length == 1 && isOperator(queryList[0])){
-            handleOperator(stack, queryList[0]);
-            return new TreeSet<>(stack.pop());
-        }
-
-        boolean usedWord = false;
-        for (int i = 0; i < queryList.length; i++) {
-            if (isOperator(queryList[i])) {
-                stack.push(keyListMap.get(handleCase(queryList[i + 1])));
-                usedWord = true;
-            }
-            if (!isOperator(queryList[i])) {
-                if (usedWord) {
-                    usedWord = false;
-                }
-                else //
-                    stack.push(keyListMap.get(handleCase(queryList[i])));
-            } else {
-                handleOperator(stack, queryList[i]);
-            }
-        }
-        return new TreeSet<>(stack.pop());
-    }
-
-
-    public void brackets(String query, Stack stack){
         StringBuilder subString = new StringBuilder();
         subString.append(query);
         String subQuery;
+        // handle brackets
         if(query.contains("(")) {
             if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
                 while (query.contains("(")) {
@@ -88,7 +58,30 @@ public abstract class AbstractInvertedIndex implements Index{
                 }
             }
         }
+        String[] queryList = Utils.splitBySpace(query);
+        if (queryList.length == 1 && isOperator(queryList[0])){
+            handleOperator(stack, queryList[0]);
+            return new TreeSet<>(stack.pop());
+        }
+        boolean usedWord = false;
+        for (int i = 0; i < queryList.length; i++) {
+            if (isOperator(queryList[i])) {
+                stack.push(keyListMap.get(handleCase(queryList[i + 1])));
+                usedWord = true;
+            }
+            if (!isOperator(queryList[i])) {
+                if (usedWord) {
+                    usedWord = false;
+                }
+                else //
+                    stack.push(keyListMap.get(handleCase(queryList[i])));
+            } else {
+                handleOperator(stack, queryList[i]);
+            }
+        }
+        return new TreeSet<>(stack.pop());
     }
+
 
     public String clearQuery(String query, int count){
         StringBuilder editString = new StringBuilder();
