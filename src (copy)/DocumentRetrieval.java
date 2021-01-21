@@ -1,7 +1,10 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 
 /**
@@ -26,18 +29,16 @@ public class DocumentRetrieval {
 //        caseInsensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
 //        caseSensitiveIndex.buildInvertedIndex( (new File(args[0])).listFiles());
 
-//        /********  FOR PROGRAM ARGUMENTS ********/
-//        caseInsensitiveIndex.buildInvertedIndex( (new File("/home/marshall" +
-//                "/Documents/HW3/AP_Coll_Parsed").listFiles()));
-//        caseSensitiveIndex.buildInvertedIndex( (new File("/home/marshall/Documents/HW3/AP_Coll_Parsed")).listFiles());
-//
-//        /********  FOR PROGRAM ARGUMENTS ********/
+        /********  FOR PROGRAM ARGUMENTS ********/
+        caseInsensitiveIndex.buildInvertedIndex( (new File("/home/marshall" +
+                "/Documents/HW3/AP_Coll_Parsed").listFiles()));
+        caseSensitiveIndex.buildInvertedIndex( (new File("/home/marshall/Documents/HW3/AP_Coll_Parsed")).listFiles());
 
-        for (String query : Utils.readLines(new File (args[1]))){
-//        for (String query : Utils.readLines(new File ("/home/marshall" +
-//                "/Documents/HW3/BooleanQueries.txt"))){ // TODO program-args
+        /********  FOR PROGRAM ARGUMENTS ********/
 
-
+//        for (String query : Utils.readLines(new File (args[1]))){
+        for (String query : Utils.readLines(new File ("/home/marshall" +
+                "/Documents/HW3/BooleanQueries.txt"))){ // TODO program-args
             System.out.println("######################################");
             System.out.println("Query: " + query);
             System.out.println("----NonCaseSensitiveIndex----");
@@ -57,14 +58,13 @@ public class DocumentRetrieval {
 
 
 
-            SortedMap<String, ArrayList<String>> intersection =
+            SortedMap<String, Set<String>> intersection =
                     AbstractInvertedIndex.intersectionMap(
                             (CaseSensitiveIndex) caseSensitiveIndex,
                             (CaseInsensitiveIndex) caseInsensitiveIndex);
 
 
-            for (SortedMap.Entry<String, ArrayList<String>> entry :
-                    intersection.entrySet()) {
+            for (SortedMap.Entry<String, Set<String>> entry : intersection.entrySet()) {
                 System.out.println(entry.getKey() + " : " + entry.getValue().toString());
             }
 

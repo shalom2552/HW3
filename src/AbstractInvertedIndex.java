@@ -32,109 +32,148 @@ public abstract class AbstractInvertedIndex implements Index{
     }
 
     public TreeSet<String> runQuery(String query){
-        TreeSet<String> result = new TreeSet<>();
-        Stack<ArrayList<String>> toolStack = new Stack<>();
-        StringBuffer editSubString = new StringBuffer();
-        editSubString.append(query);
-
+        Stack<ArrayList<String>> stack = new Stack<>();
+        StringBuilder subString = new StringBuilder();
+        subString.append(query);
         String subQuery;
         if(query.contains("(")) {
-            if ((editSubString.lastIndexOf(")") != editSubString.length() - 1 && editSubString.charAt(0) == '(')) {
+            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
                 while (query.contains("(")) {
-                    editSubString.delete(0, 1);
-                    editSubString.delete(editSubString.lastIndexOf(")"), editSubString.length());
-                    subQuery = editSubString.toString();
-                    toolStack.push(parenthesesHandler(subQuery));
-                    StringBuffer editString = new StringBuffer();
-                    editString.append(query);
-                    editString.delete(editString.indexOf("("), editString.lastIndexOf(")") + 2);
-                    query = editString.toString();
-                    if (editString.charAt(0) == ')')
-                        while (query.contains(")")) {
-                            editString.delete(0, 1);
-                            query = editString.toString();
-                        }
+                    subString.delete(0, 1);
+                    subString.delete(subString.lastIndexOf(")"), subString.length());
+                    subQuery = subString.toString();
+
+                    stack.push(parenthesesHandler(subQuery));
+
+                    query = clearQuery(query, 2);
                 }
             } else {
                 while (query.contains("(")) {
-                    StringBuffer tempString = new StringBuffer();
-                    tempString.append(editSubString.substring(editSubString.indexOf("("),editSubString.indexOf(")")));
-                    subQuery = tempString.toString();
-                    toolStack.push(parenthesesHandler(subQuery));
-                    editSubString.delete(editSubString.indexOf("("), editSubString.indexOf(")")+1);
-                    query = editSubString.toString();
+                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
+                    stack.push(parenthesesHandler(subQuery));
+                    subString.delete(subString.indexOf("("),
+                            subString.indexOf(")")+2);
+                    query = subString.toString();
                 }
             }
         }
-        String[] orderQuery = Utils.splitBySpace(query);
-        boolean isOperator = false, usedWord = false;
-        ArrayList<String> operators = new ArrayList<>();
-        operators.add("AND");
-        operators.add("NOT");
-        operators.add("OR");
-        for (int i = 0; i < orderQuery.length; i++) {
-            if (orderQuery[i].equals("")) {
-                continue;
-            }
-            if (operators.contains(orderQuery[i])) {
-                isOperator = true;
-            }
-            if (operators.contains(orderQuery[i]) && i < (orderQuery.length - 1)) {
-                if (operators.contains(orderQuery[i + 1])) {
-                    continue;
-                }
-                toolStack.push(keyListMap.get(handleCase(orderQuery[i + 1])));
-                usedWord = true;
 
+
+
+        String[] queryList = Utils.splitBySpace(query);
+        if (queryList.length == 1 && isOperator(queryList[0])){
+            handleOperator(stack, queryList[0]);
+            return new TreeSet<>(stack.pop());
+        }
+
+
+
+
+        boolean usedWord = false;
+        for (int i = 0; i < queryList.length; i++) {
+            if (isOperator(queryList[i])) {
+                stack.push(keyListMap.get(handleCase(queryList[i + 1])));
+                usedWord = true;
             }
-            if (!isOperator) {
+            if (!isOperator(queryList[i])) {
                 if (usedWord) {
                     usedWord = false;
                 }
                 else //
-                    toolStack.push(keyListMap.get(handleCase(orderQuery[i])));
-
+                    stack.push(keyListMap.get(handleCase(queryList[i])));
             } else {
-                handleOperator(toolStack, orderQuery[i]);
+                handleOperator(stack, queryList[i]);
             }
-
         }
-        result.addAll(toolStack.pop());
-        return result;
+        return new TreeSet<>(stack.pop());
     }
 
 
+//    public void fun(){
+//        if(query.contains("(")) {
+//            if ((subString.lastIndexOf(")") != subString.length() - 1 && subString.charAt(0) == '(')) {
+//                while (query.contains("(")) {
+//                    subString.delete(0, 1);
+//                    subString.delete(subString.lastIndexOf(")"), subString.length());
+//                    subQuery = subString.toString();
+//
+//                    stack.push(parenthesesHandler(subQuery));
+//
+//                    query = clearQuery(query, 2);
+//                }
+//            } else {
+//                while (query.contains("(")) {
+//                    subQuery = Utils.substringBetween(subString.toString(), "(", ")");
+//                    stack.push(parenthesesHandler(subQuery));
+//                    subString.delete(subString.indexOf("("), subString.indexOf(")")+1);
+//                    query = subString.toString();
+//                }
+//            }
+//        }
+//    }
+
+    public String clearQuery(String query, int count){
+        StringBuilder editString = new StringBuilder();
+        editString.append(query);
+        editString.delete(editString.indexOf("("),
+                editString.lastIndexOf(")") + count);
+        return editString.toString();
+    }
+
+
+    public void handleOperator(Stack<ArrayList<String>> stack,
+                          String operator) {
+        ArrayList<String> set2;
+        ArrayList<String> set1;
+        switch (operator) {
+            case "AND" -> {
+                set2 = stack.pop();
+                set1 = stack.pop();
+                set2.retainAll(set1);
+                stack.push(set2);
+            }
+            case "NOT" -> {
+                set2 = stack.pop();
+                set1 = stack.pop();
+                set1.removeAll(set2);
+                stack.push(set1);
+            }
+            case "OR" -> {
+                set2 = stack.pop();
+                set1 = stack.pop();
+                set2.addAll(set1);
+                stack.push(set2);
+            }
+        }
+    }
+
     protected ArrayList<String> parenthesesHandler(String query) {
-        Stack<ArrayList<String>> toolStack = new Stack<>();
+        Stack<ArrayList<String>> stack = new Stack<>();
         if (query.contains("(")) {
             String closedQuery = query + ")";
             String subQuery = Utils.substringBetween(closedQuery, "(", ")");
-            toolStack.push(parenthesesHandler(subQuery));
+            stack.push(parenthesesHandler(subQuery));
             query = query.replace("(", "");
             query = query.replace(")", "");
             query = query.replaceAll(subQuery, "");
 
         }
-        String[] orderQuery = Utils.splitBySpace(query);
-        for (int i = 0; i < orderQuery.length; i++) {
-            if (isOperator(orderQuery[i]) && i < (orderQuery.length - 1)) {
-                if (isOperator(orderQuery[i + 1])) {
+        String[] queryList = Utils.splitBySpace(query);
+        for (int i = 0; i < queryList.length; i++) {
+            if (isOperator(queryList[i]) && i < (queryList.length - 1)) {
+                if (isOperator(queryList[i + 1])) {
                     continue;
                 }
-                toolStack.push(keyListMap.get(handleCase(orderQuery[i + 1])));
+                stack.push(keyListMap.get(handleCase(queryList[i + 1])));
             }
-            if (!isOperator(orderQuery[i])) {
-                toolStack.push(keyListMap.get(handleCase(orderQuery[i])));
+            if (!isOperator(queryList[i])) {
+                stack.push(keyListMap.get(handleCase(queryList[i])));
             } else {
-                handleOperator(toolStack, orderQuery[i]);
+                handleOperator(stack, queryList[i]);
                 break;
             }
         }
-        return new ArrayList<>(toolStack.pop());
-    }
-
-    public void handleOperator(Stack<ArrayList<String>> stack, String string){
-        System.out.println("handleOperator!!!");
+        return new ArrayList<>(stack.pop());
     }
 
     // checks if the key has been checked before and if so then add it's file
