@@ -126,23 +126,26 @@ public abstract class AbstractInvertedIndex implements Index{
         ArrayList<String> set2;
         ArrayList<String> set1;
         switch (operator) {
-            case "AND" -> {
+            case "AND" : {
                 set2 = stack.pop();
                 set1 = stack.pop();
                 set2.retainAll(set1);
                 stack.push(set2);
+                break;
             }
-            case "NOT" -> {
+            case "NOT" : {
                 set2 = stack.pop();
                 set1 = stack.pop();
                 set1.removeAll(set2);
                 stack.push(set1);
+                break;
             }
-            case "OR" -> {
+            case "OR" : {
                 set2 = stack.pop();
                 set1 = stack.pop();
                 set2.addAll(set1);
                 stack.push(set2);
+                break;
             }
         }
     }
@@ -210,22 +213,22 @@ public abstract class AbstractInvertedIndex implements Index{
             CaseSensitiveIndex caseSensitiveIndex,
             CaseInsensitiveIndex caseInsensitiveIndex
     ) {
-        SortedSet<String> cutKeySet = new TreeSet<>();
         Set<String> sensitive = caseSensitiveIndex.keyListMap.keySet();
         Set<String> inSensitive = caseInsensitiveIndex.keyListMap.keySet();
 
+        sensitive.retainAll(inSensitive);
+
         Map<String,ArrayList<String>> keyListMap = caseSensitiveIndex.keyListMap;
 
-        for (String key1 : sensitive){
-            for (String key2 : inSensitive){
-                if (key1.equals(key2)){
-                    if (keyListMap.get(key1).size() <= 4){
-                        cutKeySet.add(key1);
-                    }
-                }
 
+        SortedSet<String> cutKeySet = new TreeSet<>();
+        for (String key : sensitive){
+            if (keyListMap.get(key).size() <= 4 && !notANumber(key) ){
+                cutKeySet.add(key);
             }
         }
+
+
 
         SortedSet<String> keys = new TreeSet<>(cutKeySet);
         SortedMap<String,ArrayList<String>> cutMap = new TreeMap<>();
@@ -236,4 +239,15 @@ public abstract class AbstractInvertedIndex implements Index{
         return cutMap;
     }
 
+    public static boolean notANumber(String key) {
+        for (int i = 0; i <= 9; i++) {
+            if (key.contains(Integer.toString(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
+
+

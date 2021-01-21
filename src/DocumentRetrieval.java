@@ -30,7 +30,7 @@ public class DocumentRetrieval {
 //        caseInsensitiveIndex.buildInvertedIndex( (new File("/home/marshall" +
 //                "/Documents/HW3/AP_Coll_Parsed").listFiles()));
 //        caseSensitiveIndex.buildInvertedIndex( (new File("/home/marshall/Documents/HW3/AP_Coll_Parsed")).listFiles());
-
+//
 //        /********  FOR PROGRAM ARGUMENTS ********/
 
         for (String query : Utils.readLines(new File (args[1]))){
@@ -52,8 +52,8 @@ public class DocumentRetrieval {
             if (!file.createNewFile()) System.out.println("file already exist");
 
             FileWriter writer = new FileWriter("IntersectionsOutput.txt");
-            writer.write("######################################");
-            writer.write("----Intersections----");
+            writer.write("######################################\n");
+            writer.write("----Intersections----\n");
 
 
 
@@ -65,7 +65,7 @@ public class DocumentRetrieval {
 
             for (SortedMap.Entry<String, ArrayList<String>> entry :
                     intersection.entrySet()) {
-                System.out.println(entry.getKey() + " : " + entry.getValue().toString());
+                writer.write(entry.getKey() + " : " + entry.getValue().toString()+ "\n");
             }
 
             writer.close();
